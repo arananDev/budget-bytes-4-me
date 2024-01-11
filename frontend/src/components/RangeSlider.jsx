@@ -1,11 +1,9 @@
-import { useState } from 'react';
-import { Slider, Typography, Grid, Box } from '@mui/material';
+// RangeSlider.js
+import { Slider, Typography, Box } from '@mui/material';
 
-const RangeSlider = ({ min, max, title }) => {
-  const [range, setRange] = useState([min, max])
-
-  const handleRangeChange = (event, newValue) => {
-    setRange(newValue);
+const RangeSlider = ({ value, min, max, onChange, title }) => {
+  const handleRangeChange = (_, newValue) => {
+    onChange(newValue);
   };
 
   return (
@@ -14,21 +12,16 @@ const RangeSlider = ({ min, max, title }) => {
         <Typography id="range-slider" gutterBottom>
           {title}
         </Typography>
-        <Grid container spacing={2} alignItems="center">
-          <Grid item xs>
-            <div className="range-slider-container">
-              <div className="range-bar" style={{ width: `300px`, marginLeft: `${range[0]}%` }} />
-              <Slider
-                value={range}
-                onChange={handleRangeChange}
-                valueLabelDisplay="auto"
-                aria-labelledby="range-slider"
-                min={min}
-                max={max}
-              />
-            </div>
-          </Grid>
-        </Grid>
+        <div className="range-slider-container">
+          <Slider
+            value={value}
+            onChange={handleRangeChange}
+            valueLabelDisplay="auto"
+            aria-labelledby="range-slider"
+            min={min}
+            max={max}
+          />
+        </div>
       </div>
     </Box>
   );
