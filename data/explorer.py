@@ -17,9 +17,10 @@ def find_filtered_numerical_data(data, df):
     
     conditions = []
     for row in data:
-        col = row[0]
-        min, max = row[1]
+        col = row["key"]
+        min, max = row["value"]
         conditions.append(df[col] < max)
         conditions.append(df[col] > min)
+    filtered_df = df[functools.reduce(lambda x, y: x & y, conditions)]
     
-    return df[functools.reduce(lambda x, y: x & y, conditions)]
+    return filtered_df.to_dict(orient="records")
