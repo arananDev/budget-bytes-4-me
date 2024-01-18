@@ -6,6 +6,11 @@ const RangeSlider = ({ value, min, max, onChange, title }) => {
     onChange(newValue);
   };
 
+  // Custom format function for value label
+  const valueLabelFormat = (value) => {
+    return value === max ? `${value}+` : value;
+  };
+
   return (
     <Box mb={2}>
       <div style={{ width: 300 }}>
@@ -17,6 +22,7 @@ const RangeSlider = ({ value, min, max, onChange, title }) => {
             value={value}
             onChange={handleRangeChange}
             valueLabelDisplay="auto"
+            valueLabelFormat={valueLabelFormat}
             aria-labelledby="range-slider"
             min={min}
             max={max}

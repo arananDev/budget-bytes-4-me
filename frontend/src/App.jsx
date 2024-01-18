@@ -6,7 +6,6 @@ import {
   Box,
   Button,
   CircularProgress,
-  Link,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -16,6 +15,18 @@ import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import axios from 'axios';
+
+const urlToTitle = (params) => {
+  const url = params.data.url
+
+  const formattedString = url.replace("https://www.budgetbytes.com/", "").replace(/\/$/, "");
+
+  // Replace '-' with spaces and capitalize each word
+  const title = formattedString.replace(/-/g, ' ')
+    .replace(/\b\w/g, char => char.toUpperCase());
+
+  return title
+}
 
 const App = () => {
   const [initialRange, setInitialRange] = useState([]);
@@ -41,12 +52,11 @@ const App = () => {
     axios.get('http://127.0.0.1:5000/api/get_data', {params: {data: JSON.stringify(filtersToLog)}})
     .then((response) => {
       setData(response.data)
-      setOpenDialog(true);
     }).catch((error)=> {
       console.error('Error fetching data:', error);
     }).finally(()=> {
-      console.log(data)
       setLoading(false)
+      setOpenDialog(true)
     })
   };
 
@@ -67,11 +77,9 @@ const App = () => {
   }, []);
 
   const columnDefs = [
-    { headerName: 'Recipe URL', field: 'url', cellRendererFramework: (params) => (<Link href={params.value} target="_blank" rel="noopener noreferrer">
-    {params.value}</Link> )},
+    { headerName: 'Recipe', field: 'url',valueGetter: (params) => {return urlToTitle(params)}, width: 10000 },
     { headerName: 'Prep Time (mins)', field: 'prep_time_mins' },
     { headerName: 'Cook Time (mins)', field: 'cook_time_mins' },
-    { headerName: 'Total Time (mins)', field: 'total_time_mins' },
     { headerName: 'Servings', field: 'servings' },
     { headerName: 'Protein per Serving (grams)', field: 'protien_per_serving_grams' },
     { headerName: 'Carbs per Serving (grams)', field: 'carbs_per_serving_grams' },
@@ -81,6 +89,13 @@ const App = () => {
     { headerName: 'Fiber per Serving (mg)', field: 'fiber_per_serving_mg' },
     { headerName: 'Ingredients', field: 'ingredients_for_servings_size' },
   ];
+
+  const gridOptions = {
+    onRowClicked: (params) => {
+      const url = params.data.url;
+      window.open(url, '_blank');
+    },
+  };
 
   return (
     <Grid
@@ -118,7 +133,7 @@ const App = () => {
         maxWidth="xl" // Set the maxWidth to 'xl' to make the dialog span the whole page
         fullWidth 
       >
-        <DialogTitle>AG-Grid</DialogTitle>
+        <DialogTitle>Filtered Results</DialogTitle>
         <DialogContent>
           {data.length > 0 && (
             <div className="ag-theme-alpine" style={{ height: '400px', width: '100%', overflowX: 'auto' }}>
@@ -133,6 +148,7 @@ const App = () => {
                   flex: 1,
                   minWidth: 150,
                 }}
+                gridOptions={gridOptions}
               />
             </div>
           )}

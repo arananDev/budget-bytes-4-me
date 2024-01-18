@@ -3,23 +3,39 @@ import functools
 
 
 def find_min_max_values(dataframe):
-    numerical_cols = dataframe.select_dtypes(include=['number']).columns
-    
-    min_max_values = []
-    for col in numerical_cols:
-        min_value = float(dataframe[col].min())
-        max_value = float(dataframe[col].max())
-        min_max_values.append({"key": col, "value": [min_value, max_value]})
-    
-    return min_max_values
+    min_max_values = {
+        'prep_time_mins': [0.0, 60],
+        'cook_time_mins': [0.0, 60],
+        'servings': [1.0, 50],
+        'protien_per_serving_grams': [0.0, 50],
+        'carbs_per_serving_grams': [0.25, 100],
+        'calories_per_serving_kcal': [5.0, 500],
+        'fat_per_serving_grams': [0.0, 50],
+        'sodium_per_serving_mg': [1.0, 1000],
+        'fiber_per_serving_mg': [0.0, 20]
+    }
+
+    return [{'key': key, 'value': value} for key, value in min_max_values.items()]
+
+max_nullifiers = {
+    "prep_time_mins": 60,
+    "cook_time_mins": 60,
+    "servings": 50,
+    "protien_per_serving_grams": 50,
+    "carbs_per_serving_grams": 100,
+    "calories_per_serving_kcal": 500,
+    "fat_per_serving_grams" :50,
+    "sodium_per_serving_mg": 1000,
+    "fiber_per_serving_mg": 20,
+}
 
 def find_filtered_numerical_data(data, df):
-    
     conditions = []
     for row in data:
         col = row["key"]
         min, max = row["value"]
-        conditions.append(df[col] < max)
+        if max != max_nullifiers[col]:
+            conditions.append(df[col] < max)
         conditions.append(df[col] > min)
     filtered_df = df[functools.reduce(lambda x, y: x & y, conditions)]
     
